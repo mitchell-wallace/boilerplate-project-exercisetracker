@@ -23,6 +23,7 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// creates 1 new user and returns this user's username and _id
 app.post('/api/users', (req, res) => {
   var newUser = {
     'username': req.body.username,
@@ -30,6 +31,11 @@ app.post('/api/users', (req, res) => {
     }
   users.push(newUser);
   res.json(newUser);
+});
+
+// returns all users in array
+app.get('/api/users', (req, res) => {
+  res.json(users);
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
