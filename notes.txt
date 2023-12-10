@@ -1,0 +1,19 @@
+* use MongoDB / Mongoose?
+    >> actually no, this is going out of scope and is unnecessary
+    for local-only use this would be fine
+    as an application that needs to be deployed to replit,
+    and ideally doesn't rely on a free cloud database to see in action,
+    simply using local arrays makes more sense
+    >> another complication is that the spec overloads the _id field
+
+* 2 collections - exercise, user
+    log is dynamically generated on request
+    iterate through all exercises, if _id matches, add to temp array
+    return user info, temp array size, and temp array
+
+* 4 api endpoints - 
+    POST /api/users (new user)
+    GET /api/users (return all users in array)
+    POST /api/users/:_id/exercises (add exercise)
+    GET /api/users/:_id/logs (returns user's log)
+
