@@ -70,11 +70,12 @@ app.post('/api/users/:_id/exercises', validateId, (req, res) => {
 });
 
 app.get('/api/users/:_id/logs', validateId, (req, res) => {
-  // test for and validate optional params
-  var limit = req.params.limit ? Number.parseInt(req.params.limit) : false;
-  var from = req.params.from ? new Date(req.params.from) : false;
+  // test for and validate optional query params
+  // e.g. /api/users/:_id/logs?limit=1&from=01-01-2000&to=01-01-2010
+  var limit = req.query.limit ? Number.parseInt(req.query.limit) : false;
+  var from = req.query.from ? new Date(req.query.from) : false;
   if (isNaN(from.valueOf())) from = false;
-  var to = req.params.to ? new Date(req.params.to) : false;
+  var to = req.query.to ? new Date(req.query.to) : false;
   if (isNaN(to.valueOf())) to = false;
 
   // filter logs if necessary
