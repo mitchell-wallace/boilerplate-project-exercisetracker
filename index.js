@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 app.post('/api/users', (req, res) => {
   var newUser = {
     'username': req.body.username,
-    '_id': users.length
+    '_id': generateId()
     }
   users.push(newUser);
   res.json(newUser);
@@ -82,20 +82,20 @@ app.get('/api/users/:_id/logs', validateId, (req, res) => {
   var result;
   if (to || from || limit) {
     result = [];
-    for (var i = 0; i < users[req.params._id].log.length; i++)
+    for (var i = 0; i < users[req.params.index].log.length; i++)
     {
       if (to || from) {
-        let exDate = new Date(users[req.params._id].log[i].date);
+        let exDate = new Date(users[req.params.index].log[i].date);
         if ((to && exDate > to) || (from && exDate < from)) continue;
       }
       if (limit && result.length >= limit) continue;
-      result.push(users[req.params._id].log[i]);
+      result.push(users[req.params.index].log[i]);
     }
   }
-  else result = users[req.params._id].log;
+  else result = users[req.params.index].log;
 
   // return user with filtered logs
-  res.json({"username":users[req.params._id].username,
+  res.json({"username":users[req.params.index].username,
     "count":result.length,
     "_id":req.params._id,
     "log":result});
@@ -126,4 +126,14 @@ function validateId(req, res, next) {
     req.params.index = userIndex;
     next();
   }
+}
+
+function generateId() {
+  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < 24; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+  return result;
 }
