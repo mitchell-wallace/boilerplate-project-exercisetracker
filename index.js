@@ -54,23 +54,47 @@ app.get('/api/users', (req, res) => {
 
 // creates 1 new exercise for user matching _id
 app.post('/api/users/:_id/exercises', (req, res) => {
+
+  // validate id
+  if (!req.params._id || req.params._id == "") {
+    res.json({"error":"Id is missing"});
+    return;
+  }
   // searching for id so that we can use identifiers other than the index
-  var userIndex;
-  // var idInput = req.params._id;
-  // var targetId = Number.parseInt(idInput);
+  var userIndex = -1;
   for (var i = 0; i < users.length; i++) {
     if (users[i]._id == req.params._id) {
       userIndex = i;
     }
   }
+  if (userIndex == -1) {
+    res.json({"error":"No matching id found"});
+    return;
+  }
 
-  // set up variables for new entry
+  // validate and set variables for remaining inputs
+  // 1 - description
+  if (!req.body.description || req.body.description == "") {
+    res.json({"error":"Description is missing"});
+    return;
+  }
   var description = req.body.description;
+
+  // 2 - duration
+  if (!req.body.duration || isNaN(req.body.duration)) {
+    res.json({"error":"Duration is not a number or is missing"});
+    return;
+  }
   var duration = parseInt(req.body.duration);
+
+  // 3 - date
   var date;
   if (!req.body.date) date = new Date().toDateString();
   else date = new Date(req.body.date).toDateString();
-    // date should be like "Sun Dec 10 2023"
+  if (date.toString() == "Invalid Date") {
+    res.json({"error":"Invalid date supplied"});
+    return;
+  }
 
   var newExercise = {
     'description': description,
@@ -79,8 +103,6 @@ app.post('/api/users/:_id/exercises', (req, res) => {
   };
 
   // if user has no log yet, create one
-  // try {!users[userIndex].log;}
-  // catch {users[userIndex].log = [];}
   if (!users[userIndex].log) users[userIndex].log = [];
 
   // add exercise to user's log and return
