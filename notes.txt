@@ -17,3 +17,10 @@
     POST /api/users/:_id/exercises (add exercise)
     GET /api/users/:_id/logs (returns user's log)
 
+* 3 optional params for GET logs
+    from - earliest date
+    to - latest date
+    limit - int of how many logs to send
+
+* misc TODOs
+    refactor - id validation for POST exercises, GET logs - refactor to reuse code

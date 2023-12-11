@@ -53,8 +53,48 @@ app.get('/api/users', (req, res) => {
 });
 
 // creates 1 new exercise for user matching _id
-app.post('/api/users/:_id/exercises', (req, res) => {
+app.post('/api/users/:_id/exercises', validateId, (req, res) => {
+  // validate remaining inputs
+  if (!req.body.description) {
+    res.json({"error":"Description is missing"});
+    return;
+  }
+  if (!req.body.duration || isNaN(req.body.duration)) {
+    res.json({"error":"Duration is not a number or is missing"});
+    return;
+  }
+  var date;
+  if (!req.body.date) date = new Date().toDateString();
+  else date = new Date(req.body.date).toDateString();
+  if (date.toString() == "Invalid Date") {
+    res.json({"error":"Invalid date supplied"});
+    return;
+  }
 
+  // add exercise to user's log and return
+  if (!users[req.params.index].log) users[req.params.index].log = [];
+  users[req.params.index].log.push({
+    'description': req.body.description,
+    'duration': parseInt(req.body.duration),
+    'date': date
+  });
+  res.json(users[req.params.index]);
+});
+
+app.get('/api/users/:_id/logs', validateId, (req, res) => {
+  // test for and validate optional params
+
+  // filter logs if necessary
+
+  // return user with filtered logs
+
+});
+
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log('Your app is listening on port ' + listener.address().port)
+})
+
+function validateId(req, res, next) {
   // validate id
   if (!req.params._id || req.params._id == "") {
     res.json({"error":"Id is missing"});
@@ -71,45 +111,8 @@ app.post('/api/users/:_id/exercises', (req, res) => {
     res.json({"error":"No matching id found"});
     return;
   }
-
-  // validate and set variables for remaining inputs
-  // 1 - description
-  if (!req.body.description || req.body.description == "") {
-    res.json({"error":"Description is missing"});
-    return;
+  else {
+    req.params.index = userIndex;
+    next();
   }
-  var description = req.body.description;
-
-  // 2 - duration
-  if (!req.body.duration || isNaN(req.body.duration)) {
-    res.json({"error":"Duration is not a number or is missing"});
-    return;
-  }
-  var duration = parseInt(req.body.duration);
-
-  // 3 - date
-  var date;
-  if (!req.body.date) date = new Date().toDateString();
-  else date = new Date(req.body.date).toDateString();
-  if (date.toString() == "Invalid Date") {
-    res.json({"error":"Invalid date supplied"});
-    return;
-  }
-
-  var newExercise = {
-    'description': description,
-    'duration': duration,
-    'date': date
-  };
-
-  // if user has no log yet, create one
-  if (!users[userIndex].log) users[userIndex].log = [];
-
-  // add exercise to user's log and return
-  users[userIndex].log.push(newExercise);
-  res.json(users[userIndex]);
-});
-
-const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Your app is listening on port ' + listener.address().port)
-})
+}
