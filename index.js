@@ -8,17 +8,7 @@ app.use(cors())
 app.use(express.static('public'))
 app.use(bodyParser.urlencoded({extended: false}));
 
-// const exercises = [];
-  // String username
-  // String description
-  // Number duration
-  // Date date
-  // String _id
-
 const users = [];
-  // String username
-  // String _id
-  // [] log
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
@@ -36,9 +26,7 @@ app.post('/api/users', (req, res) => {
 });
 
 // returns all users in array
-// TODO: hide log in these --> I think I've fixed this using Poe Assistant
 app.get('/api/users', (req, res) => {
-  
   const selectedAttributes = ["username", "_id"];
 
   const result = users.map(obj => {
@@ -83,11 +71,33 @@ app.post('/api/users/:_id/exercises', validateId, (req, res) => {
 
 app.get('/api/users/:_id/logs', validateId, (req, res) => {
   // test for and validate optional params
+  var limit = req.params.limit ? Number.parseInt(req.params.limit) : false;
+  var from = req.params.from ? new Date(req.params.from) : false;
+  if (isNaN(from.valueOf())) from = false;
+  var to = req.params.to ? new Date(req.params.to) : false;
+  if (isNaN(to.valueOf())) to = false;
 
   // filter logs if necessary
+  var result;
+  if (to || from || limit) {
+    result = [];
+    for (var i = 0; i < users[req.params._id].log.length; i++)
+    {
+      if (to || from) {
+        let exDate = new Date(users[req.params._id].log[i].date);
+        if ((to && exDate > to) || (from && exDate < from)) continue;
+      }
+      if (limit && result.length >= limit) continue;
+      result.push(users[req.params._id].log[i]);
+    }
+  }
+  else result = users[req.params._id].log;
 
   // return user with filtered logs
-
+  res.json({"username":users[req.params._id].username,
+    "count":result.length,
+    "_id":req.params._id,
+    "log":result});
 });
 
 const listener = app.listen(process.env.PORT || 3000, () => {
