@@ -66,7 +66,12 @@ app.post('/api/users/:_id/exercises', validateId, (req, res) => {
     'duration': parseInt(req.body.duration),
     'date': date
   });
-  res.json(users[req.params.index]);
+  // res.json(users[req.params.index]);
+  res.json({"username":users[req.params.index].username,
+    "_id":req.params._id,
+    'description': req.body.description,
+    'duration': parseInt(req.body.duration),
+    'date': date});
 });
 
 app.get('/api/users/:_id/logs', validateId, (req, res) => {
@@ -82,8 +87,7 @@ app.get('/api/users/:_id/logs', validateId, (req, res) => {
   var result;
   if (to || from || limit) {
     result = [];
-    for (var i = 0; i < users[req.params.index].log.length; i++)
-    {
+    for (var i = 0; i < users[req.params.index].log.length; i++) {
       if (to || from) {
         let exDate = new Date(users[req.params.index].log[i].date);
         if ((to && exDate > to) || (from && exDate < from)) continue;

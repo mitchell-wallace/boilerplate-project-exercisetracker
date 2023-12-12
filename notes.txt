@@ -38,6 +38,7 @@ Passed:You can make a GET request to /api/users to get a list of all users.
 Passed:The GET request to /api/users returns an array.
 
 >>>>Failed:Each element in the array returned from GET /api/users is an object literal containing a user's username and _id.
+>>>>Now passing - 24-char key required
 
 Passed:You can POST to /api/users/:_id/exercises with form data description, duration, and optionally date. If no date is supplied, the current date will be used.
 
@@ -57,3 +58,21 @@ Passed:The duration property of any object in the log array that is returned fro
 >>>>Failed:The date property of any object in the log array that is returned from GET /api/users/:_id/logs should be a string. Use the dateString format of the Date API.
 
 Passed:You can add from, to and limit parameters to a GET /api/users/:_id/logs request to retrieve part of the log of any user. from and to are dates in yyyy-mm-dd format. limit is an integer of how many logs to send back.
+
+
+==================
+
+Comparing with the demo code to determine the desired syntax for POST exercise response and for GET logs date
+
+username: timjimkim
+id: 6577ae6ac2e63b0014b06eb9
+
+after adding first exercise:
+{"_id":"6577ae6ac2e63b0014b06eb9","username":"timjimkim","date":"Sun Oct 10 1999","duration":20,"description":"run"}
+>> okay, so they want one object with id, username, date, duration, description
+    date format looks like what I have: "date":"Sun Oct 10 1999"
+
+logs for timjimkim:
+{"_id":"6577ae6ac2e63b0014b06eb9","username":"timjimkim","count":1,"log":[{"description":"run","duration":20,"date":"Sun Oct 10 1999"}]}
+
+I didn't change the code for logs and now that test is passing. Huh. Well, everything's working now.
