@@ -15,7 +15,6 @@ app.get('/', (req, res) => {
 });
 
 // creates 1 new user and returns this user's username and _id
-// the user will not have a log at the point of creation
 app.post('/api/users', (req, res) => {
   var newUser = {
     'username': req.body.username,
@@ -40,8 +39,8 @@ app.get('/api/users', (req, res) => {
   res.json(result);
 });
 
-// creates 1 new exercise for user matching _id
-app.post('/api/users/:_id/exercises', validateId, (req, res) => {
+// find user by id and log 1 new exercise session
+app.post('/api/users/:_id/exercises', findUser, (req, res) => {
   // validate remaining inputs
   if (!req.body.description) {
     res.json({"error":"Description is missing"});
@@ -59,14 +58,13 @@ app.post('/api/users/:_id/exercises', validateId, (req, res) => {
     return;
   }
 
-  // add exercise to user's log and return
+  // add exercise to user's log and send response
   if (!users[req.params.index].log) users[req.params.index].log = [];
   users[req.params.index].log.push({
     'description': req.body.description,
     'duration': parseInt(req.body.duration),
     'date': date
   });
-  // res.json(users[req.params.index]);
   res.json({"username":users[req.params.index].username,
     "_id":req.params._id,
     'description': req.body.description,
@@ -74,7 +72,8 @@ app.post('/api/users/:_id/exercises', validateId, (req, res) => {
     'date': date});
 });
 
-app.get('/api/users/:_id/logs', validateId, (req, res) => {
+// find user by id and return exercise logs for that user
+app.get('/api/users/:_id/logs', findUser, (req, res) => {
   // test for and validate optional query params
   // e.g. /api/users/:_id/logs?limit=1&from=01-01-2000&to=01-01-2010
   var limit = req.query.limit ? Number.parseInt(req.query.limit) : false;
@@ -107,9 +106,10 @@ app.get('/api/users/:_id/logs', validateId, (req, res) => {
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log('Your app is listening on port ' + listener.address().port)
-})
+});
 
-function validateId(req, res, next) {
+// helper middleware to validate Id and find the index to the user
+function findUser(req, res, next) {
   // validate id
   if (!req.params._id || req.params._id == "") {
     res.json({"error":"Id is missing"});
@@ -132,6 +132,7 @@ function validateId(req, res, next) {
   }
 }
 
+// helper function to generate randomised IDs for users
 function generateId() {
   const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
   let result = "";
